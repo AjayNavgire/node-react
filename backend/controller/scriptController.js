@@ -1,12 +1,13 @@
 
 const axios = require('axios');
 const { MongoClient } = require('mongodb');
+const catchAsyncError = require("../middleware/catchAsyncError");
 
 // API endpoint
 const apiEndpoint = 'https://restcountries.com/v3/all';
 
 // MongoDB connection URL
-const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017'; // Use environment variable or default
+const mongoUrl = process.env.DB_URI || 'mongodb://localhost:27017'; // Use environment variable or default
 
 // Database and collection names
 const dbName = 'User';
@@ -41,17 +42,14 @@ async function storeData(data) {
   }
 }
 
-exports.script = async function () {
-  try {
+exports.script = catchAsyncError(async function () {
     // Fetch data from the API
     const data = await fetchData();
 
     // Store the data in MongoDB
     await storeData(data);
-  } catch (error) {
-    console.error('An error occurred:', error.message);
-  }
-}
+ 
+})
 
 // Run the main function
 // main();

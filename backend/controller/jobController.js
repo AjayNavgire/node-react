@@ -1,25 +1,30 @@
 const Job = require('../models/jobModel');
+const catchAsyncError = require("../middleware/catchAsyncError");
 
-exports.addJob = async (req, res) => {
+exports.addJob = catchAsyncError(async (req, res) => {
 
-  try {
-    const { name, complexity } = req.body;
-    const job = new Job({ name, complexity });
-    await job.save();
-    res.status(201).json(job);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to submit job' });
-  }
-};
+  const { name, complexity } = req.body;
+  const job = new Job({ name, complexity });
 
-exports.getJob = async (req, res) => {
-  try {
-    const jobs = await Job.find().sort({ createdAt: 1 });
-    res.json(jobs);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch jobs' });
-  }
-}
+  await job.save();
+  
+  res.status(201).json({
+    success: true,
+    job
+  });
+});
+
+exports.getJob = catchAsyncError(async (req, res) => {
+
+  const jobs = await Job.find().sort({ createdAt: 1 });
+
+  res.status(200).json({
+    success: true,
+    jobs
+  });
+
+})
+
 
 const jobQueue = [];
 let isProcessing = false;
@@ -35,6 +40,7 @@ async function processJobQueue() {
       console.log(`Processing job: ${job.name}`);
       await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulated job execution time
       console.log(`Completed job: ${job.name}`);
+
 
       // Update job status in MongoDB
       await Job.findByIdAndUpdate(job._id, { status: 'completed' });

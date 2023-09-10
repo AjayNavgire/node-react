@@ -63,6 +63,7 @@ exports.registerUser = catchAsyncError(async (req, res, next) => {
     })
 })
 
+// Get User List
 exports.getAllUser = catchAsyncError(async(req, res, next) =>{
     const users = await User.find();
 
@@ -72,7 +73,7 @@ exports.getAllUser = catchAsyncError(async(req, res, next) =>{
     })
 })
 
-// Get single user (admin)
+// Get single user 
 exports.getSingleUser = catchAsyncError(async(req, res, next) =>{
 
     const user = await User.findById(req.params.id);
